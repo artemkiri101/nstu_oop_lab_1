@@ -12,23 +12,12 @@ double bessel_k(double nu, double x) {
 
 // --- ОСНОВНОЕ РАСПРЕДЕЛЕНИЕ (СГР) ---
 
-double pdf_main(double x, double mu, double lambda, double v) {
-    if (lambda <= 0 || v <= 0) {
-        return 0.0;
-    }
-    
-    double z = (x - mu) / lambda;
-    
-    // Теперь используем НАСТОЯЩУЮ функцию Бесселя!
-    double k1 = bessel_k(1.0, v);
-    if (k1 <= 0 || isnan(k1) || isinf(k1)) {
-        return 0.0;
-    }
-    
-    double normalization = 1.0 / (2.0 * sqrt(v) * k1);
-    double exponent = exp(-sqrt(1.0 + z * z));
-    
-    return normalization * exponent;
+double pdf_main(double x, double mu, double lambda_, double v) {
+    // ПРАВИЛЬНАЯ формула с учетом сдвиг-масштаба
+    double x_standard = (x - mu) / lambda_;
+    double z = 1 / (2 * sqrt(v) * bessel_k(1, v));  // ← Используем bessel_k вместо kn
+    double exp_arg = -v * sqrt(1 + (x_standard * x_standard) / v);
+    return (1.0 / lambda_) * z * exp(exp_arg);
 }
 
 void moments_main(double mu, double lambda, double v, double *mean, double *variance, double *skewness, double *kurtosis) {

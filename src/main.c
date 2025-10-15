@@ -150,6 +150,84 @@ void show_menu() {
                 save_plot_data(plot_324);
                 free_plot_data(plot_324);
                 free(sample_324);
+                // ------------------- Тест 3.3.1.1: Основное распределение с большим параметром формы -------------------
+                MixtureParams params_3311 = {0, 1, 5.0, 0, 0, 0, 0};  // ν=5.0
+                double* sample_3311 = (double*)malloc(10000 * sizeof(double));
+                for (int i = 0; i < 10000; i++) {
+                    sample_3311[i] = generate_main(0, 1, 5.0);
+                }
+                PlotData* plot_3311 = generate_plot_data("3.3.1.1", &params_3311, 0, sample_3311, 10000);
+                save_plot_data(plot_3311);
+                free_plot_data(plot_3311);
+                free(sample_3311);
+            
+                // ------------------- Тест 3.3.1.2: Смесь с ярко выраженными модами -------------------
+                MixtureParams params_3312 = {-3, 1, 1.0, 3, 1, 1.0, 0.3};  // две моды: -3 и 3, p=0.3
+                double* sample_3312 = (double*)malloc(10000 * sizeof(double));
+                for (int i = 0; i < 10000; i++) {
+                    sample_3312[i] = generate_mixture(&params_3312);
+                }
+                PlotData* plot_3312 = generate_plot_data("3.3.1.2", &params_3312, 1, sample_3312, 10000);
+                save_plot_data(plot_3312);
+                free_plot_data(plot_3312);
+                free(sample_3312);
+            
+                // ------------------- Тест 3.3.1.3: Основное распределение с маленьким параметром формы -------------------
+                MixtureParams params_3313 = {0, 1, 0.2, 0, 0, 0, 0};  // ν=0.2
+                double* sample_3313 = (double*)malloc(10000 * sizeof(double));
+                for (int i = 0; i < 10000; i++) {
+                    sample_3313[i] = generate_main(0, 1, 0.2);
+                }
+                PlotData* plot_3313 = generate_plot_data("3.3.1.3", &params_3313, 0, sample_3313, 10000);
+                save_plot_data(plot_3313);
+                free_plot_data(plot_3313);
+                free(sample_3313);
+            
+                // ------------------- Тест 3.3.1.4: Смесь с разными масштабами -------------------
+                MixtureParams params_3314 = {0, 0.5, 1.0, 0, 2, 1.0, 0.7};  // λ₁=0.5, λ₂=2, p=0.7
+                double* sample_3314 = (double*)malloc(10000 * sizeof(double));
+                for (int i = 0; i < 10000; i++) {
+                    sample_3314[i] = generate_mixture(&params_3314);
+                }
+                PlotData* plot_3314 = generate_plot_data("3.3.1.4", &params_3314, 1, sample_3314, 10000);
+                save_plot_data(plot_3314);
+                free_plot_data(plot_3314);
+                free(sample_3314);
+            
+                // ------------------- Тест 3.3.2: Мега сложный график - три распределения -------------------
+                
+                // Шаг 1: Основное распределение (теоретическое)
+                MixtureParams main_dist = {0, 1, 1.0, 0, 0, 0, 0};  // μ=0, λ=1, ν=1
+                PlotData* plot_main = generate_plot_data("3.3.2_main", &main_dist, 0, NULL, 0);
+                save_plot_data(plot_main);
+                free_plot_data(plot_main);
+                
+                // Шаг 2: Генерируем выборку из основного распределения
+                double* sample_from_main = (double*)malloc(5000 * sizeof(double));
+                for (int i = 0; i < 5000; i++) {
+                    sample_from_main[i] = generate_main(0, 1, 1.0);
+                }
+                
+                // Шаг 3: Эмпирическое распределение из выборки основного
+                PlotData* plot_empirical_from_main = generate_plot_data("3.3.2_empirical_main", &main_dist, 0, sample_from_main, 5000);
+                save_plot_data(plot_empirical_from_main);
+                free_plot_data(plot_empirical_from_main);
+                
+                // Шаг 4: Генерируем выборку из эмпирического распределения (бутстрэп)
+                double* sample_from_empirical = (double*)malloc(5000 * sizeof(double));
+                for (int i = 0; i < 5000; i++) {
+                    int random_index = rand() % 5000;
+                    sample_from_empirical[i] = sample_from_main[random_index];
+                }
+                
+                // Шаг 5: Эмпирическое распределение из бутстрэп-выборки
+                PlotData* plot_empirical_bootstrap = generate_plot_data("3.3.2_empirical_bootstrap", &main_dist, 0, sample_from_empirical, 5000);
+                save_plot_data(plot_empirical_bootstrap);
+                free_plot_data(plot_empirical_bootstrap);
+                
+                free(sample_from_main);
+                free(sample_from_empirical);
+                printf("Генерация данных для теста 3.3.2...\n");
                 printf("Все файлы данных сгенерированы!\n");
                 break;
                 }
